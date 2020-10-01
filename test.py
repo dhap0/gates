@@ -1,8 +1,6 @@
 import schemdraw
 import schemdraw.elements as elm
 
-#lbl = [ "A", "B", "C", "D", "I", "J", "K"]
-
 def nparalel(el, n, d, lbl):
     nr = n//2
     nl = n - nr
@@ -32,10 +30,10 @@ def nparalel(el, n, d, lbl):
     d.add(elm.ElementDrawing(dr))
     return d, xy
 
-def nserie(el,n,d,xy):
-    d.add(el(at=xy))
+def nserie(el,n,d,xy, lbl):
+    d.add(el(at=xy, rgtlabel=lbl[n-1]))
     for i in range(n-1):
-        d.add(el)
+        d.add(el(rgtlabel=lbl[n-2-i]))
     return d
 
 
@@ -46,9 +44,9 @@ def nand(d, inp=[]):
     n = len(inp)
     d, xy = nparalel(pfet, n, d, inp)
 
+    d = nserie(nfet, n, d, xy, inp)
+    d.push()
     d.add(elm.Line(at=xy, l=((n//2)+1)*3, rgtlabel="out"))
-    d.add(elm.Arrowhead())
-    d = nserie(nfet, n, d, xy)
     return d
 
     
@@ -58,6 +56,6 @@ if __name__ == "__main__":
 
     d.add(elm.Vdd(label="Vdd"))
     nand(d, ["A", "B", "C" ])
+    d.pop()
     d.add(elm.Ground(botlabel="GND"))
-    print(d.here)
     d.draw()
